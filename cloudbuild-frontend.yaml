@@ -1,0 +1,36 @@
+steps:
+  # Build the frontend Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'VITE_API_URL=YOUR_BACKEND_DEPLOYMENT_URL_HERE'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/recipe-frontend'
+      - './frontend'
+
+  # Push the frontend image
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'gcr.io/$PROJECT_ID/recipe-frontend'
+
+  # Deploy frontend to Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:slim'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'recipe-frontend'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/recipe-frontend'
+      - '--platform'
+      - 'managed'
+      - '--region'
+      - 'us-central1'
+      - '--allow-unauthenticated'
+      - '--port'
+      - '80'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
