@@ -1,6 +1,4 @@
 
-version: '3.8'
-
 services:
   backend:
     build: ./backend
@@ -10,13 +8,14 @@ services:
       - recipe_data:/app/data
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:5001
     ports:
       - "3000:80"
     depends_on:
       - backend
-    environment:
-    - VITE_API_URL=http://localhost:5001
 
 volumes:
   recipe_data:
