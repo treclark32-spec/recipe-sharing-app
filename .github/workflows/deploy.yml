@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  test-and-deploy:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,29 +46,9 @@ jobs:
             --build-arg VITE_API_URL=https://recipe-sharing-app-dhhk.onrender.com \
             -t recipe-frontend ./frontend
 
-      - name: Deploy backend to Render
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          DEPLOY_HOOK: ${{ secrets.RENDER_BACKEND_DEPLOY_HOOK }}
+      - name: CI pipeline completed
         run: |
-          test -n "$DEPLOY_HOOK" || {
-            echo "Missing backend deploy hook"
-            exit 1
-          }
-          curl --fail --show-error --silent \
-            --retry 3 \
-            --request POST "$DEPLOY_HOOK"
-
-      - name: Deploy frontend to Render
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        env:
-          DEPLOY_HOOK: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
-        run: |
-          test -n "$DEPLOY_HOOK" || {
-            echo "Missing frontend deploy hook"
-            exit 1
-          }
-          curl --fail --show-error --silent \
-            --retry 3 \
-            --request POST "$DEPLOY_HOOK"
+          echo "All tests passed!"
+          echo "Both Docker images built successfully!"
+          echo "CI checks completed."
 
